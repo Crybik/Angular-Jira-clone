@@ -1,0 +1,74 @@
+<div class="board-container">
+  <div class="board">
+    <div 
+      *ngFor="let column of columns" 
+      class="column"
+      [style.--column-color]="column.color"
+    >
+      <!-- Column Header -->
+      <div class="column-header">
+        <div class="column-title-wrapper">
+          <span class="column-indicator" [style.background]="column.color"></span>
+          <h3 class="column-title">{{ column.title }}</h3>
+          <span class="task-count">{{ getTaskCount(column) }}</span>
+        </div>
+        <div class="column-actions">
+          <span class="points-badge" *ngIf="getTotalPoints(column) > 0">
+            {{ getTotalPoints(column) }} pts
+          </span>
+          <button class="column-btn">
+            <app-icon name="dots-horizontal" [size]="18"></app-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tasks List with Drag & Drop -->
+      <div
+        cdkDropList
+        [id]="column.id"
+        [cdkDropListData]="column.tasks"
+        [cdkDropListConnectedTo]="getConnectedLists()"
+        (cdkDropListDropped)="onDrop($event, column)"
+        class="tasks-list"
+        [class.empty]="column.tasks.length === 0"
+      >
+        <app-task-card
+          *ngFor="let task of column.tasks"
+          [task]="task"
+          cdkDrag
+          [cdkDragData]="task"
+          (click)="openTaskDetail(task)"
+        >
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+        </app-task-card>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="column.tasks.length === 0">
+          <app-icon name="inbox" [size]="32"></app-icon>
+          <p>No tasks yet</p>
+        </div>
+      </div>
+
+      <!-- Add Task Button -->
+      <button class="add-task-btn" (click)="toggleCreateModal()">
+        <app-icon name="plus" [size]="18"></app-icon>
+        <span>Add Task</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Task Detail Modal -->
+<app-task-detail 
+  *ngIf="selectedTask" 
+  [task]="selectedTask"
+  (close)="closeTaskDetail()"
+></app-task-detail>
+
+<!-- Create Task Modal -->
+<app-create-task-modal
+  *ngIf="showCreateModal"
+  (close)="toggleCreateModal()"
+  (created)="onTaskCreated()"
+></app-create-task-modal>
+

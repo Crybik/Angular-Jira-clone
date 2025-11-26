@@ -1,0 +1,106 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Logo & Brand -->
+  <div class="sidebar-header">
+    <div class="brand">
+      <div class="logo">
+        <app-icon name="squares" [size]="28"></app-icon>
+      </div>
+      <span class="brand-name" *ngIf="!isCollapsed">FlowBoard</span>
+    </div>
+    <button class="collapse-btn" (click)="toggleSidebar()">
+      <app-icon [name]="isCollapsed ? 'chevron-right' : 'chevron-down'" [size]="16"></app-icon>
+    </button>
+  </div>
+
+  <!-- Project Selector -->
+  <div class="project-selector" *ngIf="!isCollapsed && activeProject">
+    <div class="project-badge" [style.background]="activeProject.color">
+      {{ activeProject.key }}
+    </div>
+    <div class="project-info">
+      <span class="project-name">{{ activeProject.name }}</span>
+      <span class="project-type">Software Project</span>
+    </div>
+    <app-icon name="chevron-down" [size]="16" class="selector-arrow"></app-icon>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of navItems" 
+          class="nav-item" 
+          [class.active]="item.active"
+          [class.collapsed]="isCollapsed">
+        <a href="javascript:void(0)">
+          <app-icon [name]="item.icon" [size]="20"></app-icon>
+          <span *ngIf="!isCollapsed">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Planning Section -->
+  <div class="sidebar-section" *ngIf="!isCollapsed">
+    <div class="section-header" (click)="toggleSection('planning')">
+      <span>Planning</span>
+      <app-icon 
+        [name]="expandedSections['planning'] ? 'chevron-down' : 'chevron-right'" 
+        [size]="14">
+      </app-icon>
+    </div>
+    <ul class="section-list" *ngIf="expandedSections['planning']">
+      <li *ngFor="let item of planningItems" class="section-item">
+        <a href="javascript:void(0)">
+          <app-icon [name]="item.icon" [size]="18"></app-icon>
+          <span>{{ item.label }}</span>
+          <span class="count-badge">{{ item.count }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Projects Section -->
+  <div class="sidebar-section" *ngIf="!isCollapsed">
+    <div class="section-header" (click)="toggleSection('projects')">
+      <span>Projects</span>
+      <app-icon 
+        [name]="expandedSections['projects'] ? 'chevron-down' : 'chevron-right'" 
+        [size]="14">
+      </app-icon>
+    </div>
+    <ul class="section-list" *ngIf="expandedSections['projects']">
+      <li *ngFor="let project of projects" 
+          class="section-item project-item"
+          [class.active]="activeProject?.id === project.id"
+          (click)="selectProject(project)">
+        <a href="javascript:void(0)">
+          <div class="project-icon" [style.background]="project.color">
+            {{ project.key.charAt(0) }}
+          </div>
+          <span>{{ project.name }}</span>
+        </a>
+      </li>
+      <li class="section-item add-item">
+        <a href="javascript:void(0)">
+          <app-icon name="plus" [size]="18"></app-icon>
+          <span>Add Project</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- User Profile -->
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <div class="user-profile">
+      <div class="user-avatar">JD</div>
+      <div class="user-info">
+        <span class="user-name">John Doe</span>
+        <span class="user-role">Product Manager</span>
+      </div>
+    </div>
+    <button class="settings-btn">
+      <app-icon name="settings" [size]="18"></app-icon>
+    </button>
+  </div>
+</aside>
+

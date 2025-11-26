@@ -1,0 +1,96 @@
+<header class="header">
+  <div class="header-left">
+    <div class="breadcrumb">
+      <span class="breadcrumb-item">Projects</span>
+      <app-icon name="chevron-right" [size]="14"></app-icon>
+      <span class="breadcrumb-item active" *ngIf="activeProject">{{ activeProject.name }}</span>
+    </div>
+    <h1 class="page-title">
+      <app-icon name="view-boards" [size]="24"></app-icon>
+      Kanban Board
+    </h1>
+  </div>
+
+  <div class="header-center">
+    <div class="search-box">
+      <app-icon name="search" [size]="18"></app-icon>
+      <input 
+        type="text" 
+        placeholder="Search tasks, projects, or team members..." 
+        [(ngModel)]="searchQuery"
+      />
+      <span class="search-shortcut">⌘K</span>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <!-- Team Avatars -->
+    <div class="team-avatars">
+      <div 
+        *ngFor="let member of teamMembers; let i = index" 
+        class="avatar-wrapper"
+        [style.z-index]="teamMembers.length - i"
+        [title]="member.name"
+      >
+        <div class="avatar" [style.background]="member.color">
+          {{ member.avatar }}
+        </div>
+      </div>
+      <button class="avatar-add">
+        <app-icon name="plus" [size]="16"></app-icon>
+      </button>
+    </div>
+
+    <!-- Notifications -->
+    <button class="icon-btn notification-btn" (click)="showNotifications = !showNotifications">
+      <app-icon name="bell" [size]="20"></app-icon>
+      <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+    </button>
+
+    <!-- Create Task Button -->
+    <button class="create-btn" (click)="onCreateTask()">
+      <app-icon name="plus" [size]="18"></app-icon>
+      <span>Create</span>
+    </button>
+  </div>
+</header>
+
+<!-- Sub Header / Filters -->
+<div class="sub-header">
+  <div class="filters">
+    <button 
+      *ngFor="let option of filterOptions"
+      class="filter-btn"
+      [class.active]="option.active"
+      (click)="toggleFilter(option)"
+    >
+      {{ option.label }}
+    </button>
+  </div>
+
+  <div class="view-options">
+    <div class="view-toggle">
+      <button class="view-btn active">
+        <app-icon name="view-boards" [size]="18"></app-icon>
+      </button>
+      <button class="view-btn">
+        <app-icon name="bars-3" [size]="18"></app-icon>
+      </button>
+      <button class="view-btn">
+        <app-icon name="calendar" [size]="18"></app-icon>
+      </button>
+    </div>
+
+    <div class="separator"></div>
+
+    <button class="action-btn">
+      <app-icon name="sparkles" [size]="16"></app-icon>
+      <span>AI Insights</span>
+    </button>
+
+    <button class="action-btn">
+      <app-icon name="dots-horizontal" [size]="18"></app-icon>
+    </button>
+  </div>
+</div>
+

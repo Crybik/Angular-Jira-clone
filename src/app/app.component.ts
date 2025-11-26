@@ -6,5 +6,17 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'firstng';
+  showCreateModal = false;
+
+  onCreateTask(): void {
+    this.showCreateModal = true;
+  }
+
+  onModalClose(): void {
+    this.showCreateModal = false;
+  }
+
+  onTaskCreated(): void {
+    this.showCreateModal = false;
+  }
 }

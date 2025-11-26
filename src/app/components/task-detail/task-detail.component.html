@@ -1,0 +1,198 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal-content">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <span class="task-id">{{ task.id }}</span>
+        <div class="status-badge" [style.background]="getStatusColor(task.status) + '20'" [style.color]="getStatusColor(task.status)">
+          <span class="status-dot" [style.background]="getStatusColor(task.status)"></span>
+          {{ getStatusLabel(task.status) }}
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn" (click)="startEditing()" *ngIf="!isEditing">
+          <app-icon name="pencil" [size]="18"></app-icon>
+        </button>
+        <button class="action-btn danger" (click)="deleteTask()">
+          <app-icon name="trash" [size]="18"></app-icon>
+        </button>
+        <button class="close-btn" (click)="onClose()">
+          <app-icon name="x" [size]="20"></app-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <div class="main-content">
+        <!-- Title -->
+        <div class="title-section">
+          <h2 class="task-title" *ngIf="!isEditing">{{ task.title }}</h2>
+          <input 
+            *ngIf="isEditing"
+            type="text" 
+            class="edit-title" 
+            [(ngModel)]="editedTitle"
+            placeholder="Task title"
+          />
+        </div>
+
+        <!-- Labels -->
+        <div class="labels-section" *ngIf="task.labels.length > 0">
+          <span 
+            *ngFor="let label of task.labels" 
+            class="label"
+            [ngStyle]="getLabelStyle(label)"
+          >
+            {{ label }}
+          </span>
+        </div>
+
+        <!-- Description -->
+        <div class="description-section">
+          <h3 class="section-title">
+            <app-icon name="document" [size]="18"></app-icon>
+            Description
+          </h3>
+          <p class="description-text" *ngIf="!isEditing && task.description">
+            {{ task.description }}
+          </p>
+          <p class="description-empty" *ngIf="!isEditing && !task.description">
+            No description provided
+          </p>
+          <textarea 
+            *ngIf="isEditing"
+            class="edit-description"
+            [(ngModel)]="editedDescription"
+            placeholder="Add a description..."
+            rows="4"
+          ></textarea>
+        </div>
+
+        <!-- Edit Actions -->
+        <div class="edit-actions" *ngIf="isEditing">
+          <button class="btn btn-primary" (click)="saveEdits()">Save Changes</button>
+          <button class="btn btn-secondary" (click)="cancelEditing()">Cancel</button>
+        </div>
+
+        <!-- Subtasks / Checklist -->
+        <div class="subtasks-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <app-icon name="clipboard-list" [size]="18"></app-icon>
+              Checklist
+            </h3>
+            <span class="progress-text" *ngIf="task.subtasks.length > 0">
+              {{ completedSubtasks }}/{{ task.subtasks.length }} completed
+            </span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-bar" *ngIf="task.subtasks.length > 0">
+            <div class="progress-fill" [style.width.%]="subtaskProgress"></div>
+          </div>
+
+          <!-- Subtasks List -->
+          <ul class="subtasks-list">
+            <li 
+              *ngFor="let subtask of task.subtasks" 
+              class="subtask-item"
+              [class.completed]="subtask.completed"
+            >
+              <label class="checkbox-wrapper">
+                <input 
+                  type="checkbox" 
+                  [checked]="subtask.completed"
+                  (change)="toggleSubtask(subtask)"
+                />
+                <span class="checkmark">
+                  <app-icon name="check" [size]="12" *ngIf="subtask.completed"></app-icon>
+                </span>
+                <span class="subtask-title">{{ subtask.title }}</span>
+              </label>
+            </li>
+          </ul>
+
+          <!-- Add Subtask -->
+          <div class="add-subtask">
+            <app-icon name="plus" [size]="16"></app-icon>
+            <input 
+              type="text" 
+              placeholder="Add a checklist item..."
+              [(ngModel)]="newSubtaskTitle"
+              (keydown)="onSubtaskKeydown($event)"
+            />
+            <button class="add-btn" (click)="addSubtask()" *ngIf="newSubtaskTitle">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-content">
+        <!-- Assignee -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <app-icon name="user" [size]="16"></app-icon>
+            Assignee
+          </label>
+          <div class="assignee-value" *ngIf="task.assignee">
+            <div class="assignee-avatar">{{ task.assigneeAvatar }}</div>
+            <span>{{ task.assignee }}</span>
+          </div>
+          <span class="unassigned" *ngIf="!task.assignee">Unassigned</span>
+        </div>
+
+        <!-- Priority -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <app-icon name="flag" [size]="16"></app-icon>
+            Priority
+          </label>
+          <div class="priority-value" [style.color]="getPriorityColor(task.priority)">
+            <app-icon [name]="task.priority === 'low' || task.priority === 'medium' ? 'arrow-down' : 'arrow-up'" [size]="16"></app-icon>
+            <span>{{ getPriorityLabel(task.priority) }}</span>
+          </div>
+        </div>
+
+        <!-- Story Points -->
+        <div class="detail-item" *ngIf="task.storyPoints">
+          <label class="detail-label">
+            <app-icon name="lightning-bolt" [size]="16"></app-icon>
+            Story Points
+          </label>
+          <span class="points-value">{{ task.storyPoints }}</span>
+        </div>
+
+        <!-- Due Date -->
+        <div class="detail-item" *ngIf="task.dueDate">
+          <label class="detail-label">
+            <app-icon name="calendar" [size]="16"></app-icon>
+            Due Date
+          </label>
+          <span class="date-value">{{ formatDate(task.dueDate) }}</span>
+        </div>
+
+        <!-- Created -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <app-icon name="clock" [size]="16"></app-icon>
+            Created
+          </label>
+          <span class="date-value">{{ formatDate(task.createdAt) }}</span>
+        </div>
+
+        <!-- Updated -->
+        <div class="detail-item">
+          <label class="detail-label">
+            <app-icon name="clock" [size]="16"></app-icon>
+            Updated
+          </label>
+          <span class="date-value">{{ formatDate(task.updatedAt) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
